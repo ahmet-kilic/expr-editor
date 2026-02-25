@@ -18,17 +18,7 @@ npm run build
 
 *(Note: Building the package is required because the demo links to the `package` directory locally via `file:../package`.)*
 
-### 2. Copy the WASM Binary
-
-The `ExprEditor` requires the WebAssembly binary to be served statically. You need to copy the compiled `expr-linter.wasm` from the package to the demo's `public` directory:
-
-```bash
-cd ../demo
-mkdir -p public
-cp ../package/public/expr-linter.wasm ./public/expr-linter.wasm
-```
-
-### 3. Start the Demo
+### 2. Start the Demo
 
 Install the dependencies for the demo application and start the Vite development server:
 

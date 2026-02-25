@@ -9,23 +9,21 @@ import { initWasm, isWasmReady } from './wasmLoader';
 
 export interface ExprEditorProps extends Omit<ReactCodeMirrorProps, 'extensions'> {
     environment?: Record<string, any>;
-    wasmUrl?: string;
 }
 
 export const ExprEditor: React.FC<ExprEditorProps> = ({
     environment = {},
-    wasmUrl = '/expr-linter.wasm',
     ...props
 }) => {
     const [wasmLoaded, setWasmLoaded] = useState(isWasmReady());
 
     useEffect(() => {
         if (!wasmLoaded) {
-            initWasm(wasmUrl)
+            initWasm()
                 .then(() => setWasmLoaded(true))
                 .catch(e => console.error("Failed to load expr wasm", e));
         }
-    }, [wasmUrl, wasmLoaded]);
+    }, [wasmLoaded]);
 
     const envJson = useMemo(() => JSON.stringify(environment), [environment]);
 

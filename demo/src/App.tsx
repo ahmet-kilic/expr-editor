@@ -94,7 +94,6 @@ function App() {
         value={code}
         onChange={(val) => setCode(val)}
         environment={environment}
-        wasmUrl="/expr-linter.wasm"
         height="200px"
         theme={getTheme()}
       />

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import path from 'path';
@@ -25,5 +26,18 @@ export default defineConfig({
       }
     }
   },
-  plugins: [dts()]
+  plugins: [
+    dts(),
+    {
+      name: 'inline-wasm',
+      transform(code, id) {
+        if (id.endsWith('.wasm?raw')) {
+          const filePath = id.replace('?raw', '');
+          const buffer = readFileSync(filePath);
+          const base64 = buffer.toString('base64');
+          return `export default "${base64}";`;
+        }
+      }
+    }
+  ]
 });

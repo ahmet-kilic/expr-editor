@@ -23,7 +23,6 @@
   },
   "files": [
     "dist",
-    "public/expr-linter.wasm",
     "README.md"
   ],
   "type": "module",
