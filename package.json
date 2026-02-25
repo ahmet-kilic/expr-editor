@@ -1,0 +1,16 @@
+{
+    "name": "expr-editor-monorepo",
+    "private": true,
+    "version": "1.0.0",
+    "workspaces": [
+        "package",
+        "demo"
+    ],
+    "scripts": {
+        "dev": "npm run dev --workspace demo",
+        "build:package": "npm run build --workspace package",
+        "build:demo": "npm run build --workspace demo",
+        "build": "npm run build --workspaces --if-present",
+        "test": "npm run test --workspace package"
+    }
+}

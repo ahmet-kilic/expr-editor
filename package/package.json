@@ -1,0 +1,60 @@
+{
+  "name": "expr-editor",
+  "version": "1.0.0",
+  "description": "A WebAssembly-powered real-time linter and autocomplete code editor for antonmedv/expr",
+  "main": "./dist/expr-editor.umd.js",
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "expr",
+    "react",
+    "codemirror",
+    "editor",
+    "wasm",
+    "golang"
+  ],
+  "author": "Ahmet Emre Kilic",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aekilic/expr-editor.git"
+  },
+  "files": [
+    "dist",
+    "public/expr-linter.wasm",
+    "README.md"
+  ],
+  "type": "module",
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.20.0",
+    "@codemirror/lang-javascript": "^6.2.4",
+    "@codemirror/language": "^6.12.2",
+    "@codemirror/lint": "^6.9.4",
+    "@codemirror/state": "^6.5.4",
+    "@codemirror/view": "^6.39.15",
+    "@uiw/react-codemirror": "^4.25.5"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.0.18"
+  },
+  "module": "./dist/expr-editor.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/expr-editor.es.js",
+      "require": "./dist/expr-editor.umd.js"
+    }
+  }
+}

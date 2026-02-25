@@ -1,0 +1,36 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS Files
+.DS_Store
+*.swp
+
+# Node modules
+node_modules/
+package/node_modules/
+demo/node_modules/
+
+# Build and Dist
+dist/
+dist-ssr/
+*.local
+
+# WebAssembly (Only ignore compiled binaries, keep source)
+package/public/expr-linter.wasm
+demo/public/expr-linter.wasm
+expr-linter.wasm
+
+# Editor directories and files
+.idea
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
