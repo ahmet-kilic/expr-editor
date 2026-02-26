@@ -1,6 +1,6 @@
 {
   "name": "expr-editor",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A WebAssembly-powered real-time linter and autocomplete code editor for antonmedv/expr",
   "main": "./dist/expr-editor.umd.js",
   "scripts": {
@@ -19,11 +19,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ahmet-kilic/expr-editor.git"
+    "url": "git+https://github.com/ahmet-kilic/expr-editor.git"
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "type": "module",
   "dependencies": {
