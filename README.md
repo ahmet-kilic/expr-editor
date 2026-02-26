@@ -2,6 +2,8 @@
 
 Welcome to the `expr-editor` workspace! This project bridges the [antonmedv/expr](https://github.com/expr-lang/expr) Go evaluation engine with a React-ready `CodeMirror` frontend utilizing WebAssembly.
 
+![Expr Editor Demo](./media/expr-demo.gif)
+
 ## Workspace Structure
 
 This repo is structured as an npm workspace monorepo with three main directories:
