@@ -19,7 +19,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aekilic/expr-editor.git"
+    "url": "https://github.com/ahmet-kilic/expr-editor.git"
   },
   "files": [
     "dist",
