@@ -1,0 +1,124 @@
+@top Program { expression }
+
+@precedence {
+  member @left,
+  call,
+  prefix,
+  postfix,
+  exp @right,
+  times @left,
+  plus @left,
+  shift @left,
+  bitand @left,
+  bitxor @left,
+  bitor @left,
+  compare @left,
+  and @left,
+  or @left,
+  ternary @right
+}
+
+expression {
+  Literal |
+  Identifier |
+  UnaryExpression |
+  BinaryExpression |
+  TernaryExpression |
+  ArrayExpression |
+  ObjectExpression |
+  MemberExpression |
+  CallExpression |
+  ParenthesizedExpression |
+  PointerExpression
+}
+
+Literal {
+  String |
+  Number |
+  Boolean |
+  Nil
+}
+
+TernaryExpression {
+  expression !ternary "?" expression ":" expression
+}
+
+ArrayExpression {
+  "[" commaSep<expression> "]"
+}
+
+ObjectExpression {
+  "{" commaSep<Property> "}"
+}
+
+Property {
+  (Identifier | String) ":" expression
+}
+
+MemberExpression {
+  expression !member ("." Identifier | "[" expression "]")
+}
+
+PointerExpression {
+  "." Identifier
+}
+
+CallExpression {
+  expression !call "(" commaSep<expression> ")" |
+  expression !call "." Identifier "(" commaSep<expression> ")"
+}
+
+ParenthesizedExpression {
+  "(" expression ")"
+}
+
+commaSep<content> {
+  "" | content ("," content?)*
+}
+
+@tokens {
+  Identifier { $[a-zA-Z_] $[a-zA-Z0-9_]* }
+  
+  String {
+    "\"" (!["\\] | "\\" _)* "\"" |
+    "'" (!['\\] | "\\" _)* "'" |
+    "`" ![`]* "`"
+  }
+  
+  Number {
+    $[0-9]+ ("." $[0-9]+)? ($[eE] $[+\-]? $[0-9]+)?
+  }
+  
+  LineComment { "#" ![\n]* }
+  
+  space { $[ \t\n\r]+ }
+  
+  @precedence { String, Identifier }
+  @precedence { Number, Identifier }
+}
+
+@skip { space | LineComment }
+
+Boolean { @specialize<Identifier, "true"> | @specialize<Identifier, "false"> }
+Nil { @specialize<Identifier, "nil"> | @specialize<Identifier, "null"> }
+
+UnaryExpression {
+  !prefix (("!" | @specialize<Identifier, "not">) | ("+" | "-")) expression
+}
+
+BinaryExpression {
+  expression !times ("*" | "/" | "%") expression |
+  expression !plus ("+" | "-") expression |
+  expression !exp ("**" | "^") expression |
+  expression !compare (
+    "==" | "!=" | "<" | "<=" | ">" | ">=" | 
+    @specialize<Identifier, "in"> | 
+    @specialize<Identifier, "not-in"> | 
+    @specialize<Identifier, "matches"> | 
+    @specialize<Identifier, "contains"> | 
+    @specialize<Identifier, "startsWith"> | 
+    @specialize<Identifier, "endsWith">
+  ) expression |
+  expression !and ("&&" | @specialize<Identifier, "and">) expression |
+  expression !or ("||" | @specialize<Identifier, "or">) expression
+}

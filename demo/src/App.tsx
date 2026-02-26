@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { ExprEditor } from 'package'
+import { ExprEditor, initWasm, isWasmReady } from 'package'
 import { dracula } from '@uiw/codemirror-theme-dracula';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 
@@ -7,6 +7,15 @@ function App() {
   const [code, setCode] = useState('user.Age > 18 && filter(tweets, .Len > 140)');
   const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'dracula' | 'vscode'>('dark');
   const [result, setResult] = useState<string>('');
+  const [wasmLoaded, setWasmLoaded] = useState(isWasmReady());
+
+  useEffect(() => {
+    if (!wasmLoaded) {
+      initWasm()
+        .then(() => setWasmLoaded(true))
+        .catch(e => console.error("Failed to init wasm in demo", e));
+    }
+  }, [wasmLoaded]);
 
   useEffect(() => {
     if (themeMode === 'light') {
@@ -36,7 +45,7 @@ function App() {
   }), []);
 
   useEffect(() => {
-    if (typeof (globalThis as any).runExpr === 'function') {
+    if (wasmLoaded && typeof (globalThis as any).runExpr === 'function') {
       try {
         const out = (globalThis as any).runExpr(code, JSON.stringify(environment));
         if (out.valid) {
@@ -50,7 +59,7 @@ function App() {
     } else {
       setResult('WASM not loaded yet...');
     }
-  }, [code, environment]);
+  }, [code, environment, wasmLoaded]);
 
   const getTheme = () => {
     switch (themeMode) {

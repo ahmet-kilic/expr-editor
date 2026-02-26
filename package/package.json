@@ -4,6 +4,8 @@
   "description": "A WebAssembly-powered real-time linter and autocomplete code editor for antonmedv/expr",
   "main": "./dist/expr-editor.umd.js",
   "scripts": {
+    "prebuild": "lezer-generator src/expr.grammar -o src/expr.js",
+    "pretest": "lezer-generator src/expr.grammar -o src/expr.js",
     "build": "vite build",
     "test": "vitest run"
   },
@@ -34,6 +36,8 @@
     "@codemirror/lint": "^6.9.4",
     "@codemirror/state": "^6.5.4",
     "@codemirror/view": "^6.39.15",
+    "@lezer/highlight": "^1.2.3",
+    "@lezer/lr": "^1.4.8",
     "@uiw/react-codemirror": "^4.25.5"
   },
   "peerDependencies": {
@@ -41,6 +45,7 @@
     "react-dom": ">=18.0.0"
   },
   "devDependencies": {
+    "@lezer/generator": "^1.8.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "typescript": "^5.9.3",

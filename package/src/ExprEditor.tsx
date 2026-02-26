@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import CodeMirror, { ReactCodeMirrorProps } from '@uiw/react-codemirror';
 import { linter, lintGutter } from '@codemirror/lint';
 import { autocompletion } from '@codemirror/autocomplete';
-import { javascript } from '@codemirror/lang-javascript';
+import { expr } from './language';
 import { getExprLinter } from './linter';
 import { getExprAutocomplete } from './autocomplete';
 import { initWasm, isWasmReady } from './wasmLoader';
@@ -34,7 +34,7 @@ export const ExprEditor: React.FC<ExprEditorProps> = ({
         } catch (e) { }
 
         return [
-            javascript(),
+            expr(),
             lintGutter(),
             linter(getExprLinter(envJson), { delay: 300 }),
             autocompletion({ override: [getExprAutocomplete(parsedEnv)] })
