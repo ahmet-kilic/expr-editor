@@ -1,8 +1,1 @@
-import { parser } from "./expr.js"
-
-const code = "a and b"
-const tree = parser.parse(code)
-let cursor = tree.cursor()
-do {
-    console.log(cursor.name, JSON.stringify(code.slice(cursor.from, cursor.to)))
-} while (cursor.next())
+console.log("This smoke script was moving to an automated test located at src/__tests__/parser.test.ts. Please use vitest or 'npm run test' to run it.");
