@@ -34,3 +34,7 @@ expr-linter.wasm
 *.njsproj
 *.sln
 *.sw?
+ 
+# Generated lexer files
+package/src/expr.js
+package/src/expr.terms.js
