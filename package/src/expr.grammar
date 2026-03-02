@@ -1,4 +1,4 @@
-@top Program { statement+ }
+@top Program { statement* }
 
 statement {
   ExpressionStatement |
@@ -100,7 +100,7 @@ ParenthesizedExpression {
 }
 
 commaSep<content> {
-  "" | content ("," content?)*
+  "" | content ("," content)* ","?
 }
 
 @tokens {
@@ -151,24 +151,25 @@ Boolean { @specialize<Identifier, "true"> | @specialize<Identifier, "false"> }
 Nil { @specialize<Identifier, "nil"> | @specialize<Identifier, "null"> }
 
 UnaryExpression {
-  !prefix (("!" | @specialize<Identifier, "not">) | ("+" | "-")) expression
+  !prefix (LogicOp { "!" | @specialize<Identifier, "not"> } | ArithOp { "+" | "-" }) expression
 }
 
 BinaryExpression {
-  expression !times ("*" | Divide | "%") expression |
-  expression !plus ("+" | "-") expression |
-  expression !exp ("**" | "^") expression |
-  expression !range ".." expression |
-  expression !compare (
+  expression !times ArithOp { "*" | Divide | "%" } expression |
+  expression !plus ArithOp { "+" | "-" } expression |
+  expression !exp ArithOp { "**" | "^" } expression |
+  expression !range Operator { ".." } expression |
+  expression !compare CompareOp {
     "==" | "!=" | "<" | "<=" | ">" | ">=" | 
     @specialize<Identifier, "in"> | 
+    @specialize<Identifier, "not"> @specialize<Identifier, "in"> | 
     @specialize<Identifier, "matches"> | 
     @specialize<Identifier, "contains"> | 
     @specialize<Identifier, "startsWith"> | 
     @specialize<Identifier, "endsWith">
-  ) expression |
-  expression !and ("&&" | @specialize<Identifier, "and">) expression |
-  expression !or ("||" | @specialize<Identifier, "or">) expression |
-  expression !coalesce "??" expression |
-  expression !pipe "|" expression
+  } expression |
+  expression !and LogicOp { "&&" | @specialize<Identifier, "and"> } expression |
+  expression !or LogicOp { "||" | @specialize<Identifier, "or"> } expression |
+  expression !coalesce Operator { "??" } expression |
+  expression !pipe Operator { "|" } expression
 }

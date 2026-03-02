@@ -75,4 +75,31 @@ describe('getExprAutocomplete', () => {
         const result = autocomplete(context);
         expect(result).toBeNull();
     });
+
+    it('should complete properties of an array element with index', () => {
+        const context = createMockContext('tweets[0].');
+        const result = autocomplete(context);
+
+        expect(result).not.toBeNull();
+        const labels = result!.options.map(o => o.label);
+        expect(labels).toContain('Text');
+        expect(labels).toContain('Len');
+        expect(labels).not.toContain('Name');
+    });
+
+    it('should complete properties of an element with string key', () => {
+        const context = createMockContext('user["Address"].');
+        const result = autocomplete(context);
+
+        expect(result).not.toBeNull();
+        const labels = result!.options.map(o => o.label);
+        expect(labels).toContain('City');
+    });
+
+    it('should not complete immediately after right bracket', () => {
+        const context = createMockContext('tweets[0]');
+        const result = autocomplete(context);
+
+        expect(result).toBeNull();
+    });
 });

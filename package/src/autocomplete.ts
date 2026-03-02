@@ -2,11 +2,14 @@ import { CompletionContext, CompletionResult, Completion } from '@codemirror/aut
 
 export function getExprAutocomplete(environment: Record<string, any>) {
     return (context: CompletionContext): CompletionResult | null => {
-        let match = context.matchBefore(/[\w.]*/);
+        let match = context.matchBefore(/[\w.\[\]'"]*/);
         if (!match || (match.from === match.to && !context.explicit)) return null;
 
         const text = match.text;
-        const parts = text.split('.');
+        if (text.endsWith(']')) return null;
+
+        const normalizedText = text.replace(/\[['"]?([^'"\[\]]+)['"]?\]/g, '.$1');
+        const parts = normalizedText.split('.');
 
         let currentObj = environment;
         let pathFound = true;
@@ -56,9 +59,9 @@ export function getExprAutocomplete(environment: Record<string, any>) {
                 filter: { signature: 'filter(collection, predicate) []any', info: 'Filter a collection by a predicate.' },
                 map: { signature: 'map(collection, closure) []any', info: 'Map a collection with a closure.' },
                 all: { signature: 'all(collection, predicate) bool', info: 'Return true if all elements satisfy the predicate.' },
-                none: { signature: 'none(collection, predicate) bool', info: 'Return true if all elements does not satisfy the predicate.' },
-                any: { signature: 'any(collection, predicate) bool', info: 'Return true if any element satisfy the predicate.' },
-                one: { signature: 'one(collection, predicate) bool', info: 'Return true if exactly one element satisfy the predicate.' },
+                none: { signature: 'none(collection, predicate) bool', info: 'Return true if all elements no elements satisfy the predicate.' },
+                any: { signature: 'any(collection, predicate) bool', info: 'Return true if any element satisfies the predicate.' },
+                one: { signature: 'one(collection, predicate) bool', info: 'Return true if exactly one element satisfies the predicate.' },
                 count: { signature: 'count(collection, predicate) int', info: 'Returns the number of elements that satisfy the predicate.' },
                 trim: { signature: 'trim(str[, chars]) string', info: 'Removes white spaces from both ends of a string.' },
                 trimPrefix: { signature: 'trimPrefix(str, prefix) string', info: 'Removes the specified prefix from the string.' },
