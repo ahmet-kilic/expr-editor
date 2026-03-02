@@ -1,0 +1,175 @@
+@top Program { statement* }
+
+statement {
+  ExpressionStatement |
+  VariableDeclaration
+}
+
+ExpressionStatement {
+  expression ";"?
+}
+
+VariableDeclaration {
+  @specialize<Identifier, "let"> Identifier "=" expression ";"?
+}
+
+@precedence {
+  member @left,
+  call,
+  prefix,
+  postfix,
+  exp @right,
+  times @left,
+  plus @left,
+  shift @left,
+  bitand @left,
+  bitxor @left,
+  bitor @left,
+  range @left,
+  compare @left,
+  and @left,
+  or @left,
+  coalesce @left,
+  ternary @right,
+  pipe @left
+}
+
+expression {
+  Literal |
+  Identifier |
+  UnaryExpression |
+  BinaryExpression |
+  TernaryExpression |
+  ArrayExpression |
+  ObjectExpression |
+  Closure |
+  MemberExpression |
+  SliceExpression |
+  CallExpression |
+  ParenthesizedExpression |
+  PointerExpression
+}
+
+Closure {
+  "{" statement+ "}"
+}
+
+Literal {
+  String |
+  Bytes |
+  Number |
+  Boolean |
+  Nil
+}
+
+TernaryExpression {
+  expression !ternary "?" expression ":" expression
+}
+
+ArrayExpression {
+  "[" commaSep<expression> "]"
+}
+
+ObjectExpression {
+  "{" "}" | "{" Property ("," Property)* "}"
+}
+
+Property {
+  (Identifier | String) ":" expression
+}
+
+MemberExpression {
+  expression !member (("." | "?.") Identifier | "[" expression "]")
+}
+
+SliceExpression {
+  expression !member "[" expression? ":" expression? "]"
+}
+
+PointerExpression {
+  "." Identifier
+}
+
+CallExpression {
+  expression !call "(" commaSep<expression> ")" |
+  expression !call ("." | "?.") Identifier "(" commaSep<expression> ")"
+}
+
+ParenthesizedExpression {
+  "(" expression ")"
+}
+
+commaSep<content> {
+  "" | content ("," content)* ","?
+}
+
+@tokens {
+  Identifier { ($[a-zA-Z_] | "#") $[a-zA-Z0-9_]* }
+  
+  String {
+    "\"" (!["\\] | "\\" _)* "\"" |
+    "'" (!['\\] | "\\" _)* "'" |
+    "`" ![`]* "`"
+  }
+
+  Bytes {
+    ("b" | "B") "\"" (!["\\] | "\\" _)* "\"" |
+    ("b" | "B") "'" (!['\\] | "\\" _)* "'"
+  }
+  
+  Number {
+    $[0-9]+ ("." $[0-9]+)? ($[eE] $[+\-]? $[0-9]+)? |
+    "0x" $[0-9a-fA-F]+ |
+    "0o" $[0-7]+ |
+    "0b" $[01]+
+  }
+  
+  LineComment { "//" ![\n]* }
+  Divide { "/" }
+  
+  space { $[ \t\n\r]+ }
+  
+  @precedence { String, Identifier }
+  @precedence { Bytes, Identifier }
+  @precedence { Number, Identifier }
+  @precedence { LineComment, Divide }
+}
+
+@skip {} {
+  BlockComment { "/*" (blockCommentRest | blockCommentFallback)* blockCommentEnd }
+}
+
+@local tokens {
+  blockCommentEnd { "*/" }
+  blockCommentFallback { ![*] }
+  @else blockCommentRest
+}
+
+@skip { space | LineComment | BlockComment }
+
+Boolean { @specialize<Identifier, "true"> | @specialize<Identifier, "false"> }
+Nil { @specialize<Identifier, "nil"> | @specialize<Identifier, "null"> }
+
+UnaryExpression {
+  !prefix (LogicOp { "!" | @specialize<Identifier, "not"> } | ArithOp { "+" | "-" }) expression
+}
+
+BinaryExpression {
+  expression !times ArithOp { "*" | Divide | "%" } expression |
+  expression !plus ArithOp { "+" | "-" } expression |
+  expression !exp ArithOp { "**" | "^" } expression |
+  expression !range Operator { ".." } expression |
+  expression !compare CompareOp {
+    "==" | "!=" | "<" | "<=" | ">" | ">=" | 
+    @specialize<Identifier, "in"> | 
+    @specialize<Identifier, "not"> @specialize<Identifier, "in"> | 
+    @specialize<Identifier, "matches"> | 
+    @specialize<Identifier, "contains"> | 
+    @specialize<Identifier, "startsWith"> | 
+    @specialize<Identifier, "endsWith">
+  } expression |
+  expression !and LogicOp { "&&" | @specialize<Identifier, "and"> } expression |
+  expression !or LogicOp { "||" | @specialize<Identifier, "or"> } expression |
+  expression !coalesce Operator { "??" } expression |
+  expression !pipe Operator { "|" } expression
+}

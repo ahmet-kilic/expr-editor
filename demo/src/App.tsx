@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { ExprEditor } from 'package'
+import { ExprEditor, initWasm, isWasmReady } from 'package'
 import { dracula } from '@uiw/codemirror-theme-dracula';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 
@@ -7,6 +7,15 @@ function App() {
   const [code, setCode] = useState('user.Age > 18 && filter(tweets, .Len > 140)');
   const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'dracula' | 'vscode'>('dark');
   const [result, setResult] = useState<string>('');
+  const [wasmLoaded, setWasmLoaded] = useState(isWasmReady());
+
+  useEffect(() => {
+    if (!wasmLoaded) {
+      initWasm()
+        .then(() => setWasmLoaded(true))
+        .catch(e => console.error("Failed to init wasm in demo", e));
+    }
+  }, [wasmLoaded]);
 
   useEffect(() => {
     if (themeMode === 'light') {
@@ -24,21 +33,20 @@ function App() {
     }
   }, [themeMode]);
 
-  const environment = useMemo(() => ({
-    user: {
-      Name: "string",
-      Age: 18,
-      IsAdmin: false
-    },
-    tweets: [
-      { Text: "string", Len: 10 }
-    ],
-  }), []);
+  const [envJson, setEnvJson] = useState('{\n  "user": {\n    "Name": "string",\n    "Age": 18,\n    "IsAdmin": false\n  },\n  "tweets": [\n    {\n      "Text": "string",\n      "Len": 10\n    }\n  ]\n}');
+
+  const environment = useMemo(() => {
+    try {
+      return JSON.parse(envJson);
+    } catch (e) {
+      return null;
+    }
+  }, [envJson]);
 
   useEffect(() => {
-    if (typeof (globalThis as any).runExpr === 'function') {
+    if (wasmLoaded && typeof (globalThis as any).runExpr === 'function') {
       try {
-        const out = (globalThis as any).runExpr(code, JSON.stringify(environment));
+        const out = (globalThis as any).runExpr(code, JSON.stringify(environment || {}));
         if (out.valid) {
           setResult(out.result !== undefined ? out.result : 'null');
         } else {
@@ -50,7 +58,7 @@ function App() {
     } else {
       setResult('WASM not loaded yet...');
     }
-  }, [code, environment]);
+  }, [code, environment, wasmLoaded]);
 
   const getTheme = () => {
     switch (themeMode) {
@@ -84,16 +92,20 @@ function App() {
       </div>
 
       <div style={{ marginBottom: '20px' }}>
-        <strong>Environment context:</strong>
-        <pre style={{ padding: '10px', borderRadius: '4px', ...preStyles }}>
-          {JSON.stringify(environment, null, 2)}
-        </pre>
+        <strong>Environment context (JSON):</strong>
+        <textarea
+          value={envJson}
+          onChange={(e) => setEnvJson(e.target.value)}
+          spellCheck={false}
+          style={{ width: '100%', boxSizing: 'border-box', height: '150px', padding: '10px', borderRadius: '4px', fontFamily: 'monospace', ...preStyles }}
+        />
+        {!environment && <div style={{ color: '#ff4444', marginTop: '5px' }}>Invalid JSON</div>}
       </div>
 
       <ExprEditor
         value={code}
         onChange={(val) => setCode(val)}
-        environment={environment}
+        environment={environment || {}}
         height="200px"
         theme={getTheme()}
       />
