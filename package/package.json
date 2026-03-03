@@ -1,6 +1,6 @@
 {
   "name": "expr-editor",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "A WebAssembly-powered real-time linter and autocomplete code editor for antonmedv/expr",
   "main": "./dist/expr-editor.umd.js",
   "scripts": {
