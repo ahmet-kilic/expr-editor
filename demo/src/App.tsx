@@ -6,7 +6,6 @@ import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 function App() {
   const [code, setCode] = useState('user.Age > 18 && filter(tweets, .Len > 140)');
   const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'dracula' | 'vscode'>('dark');
-  const [result, setResult] = useState<string>('');
   const [wasmLoaded, setWasmLoaded] = useState(isWasmReady());
 
   useEffect(() => {
@@ -43,7 +42,7 @@ function App() {
     }
   }, [envJson]);
 
-  useEffect(() => {
+  const result = useMemo(() => {
     type RunExprFunc = (code: string, env: string) => { valid: boolean; result?: string; error?: string };
     const runExpr = (globalThis as unknown as { runExpr?: RunExprFunc }).runExpr;
 
@@ -51,16 +50,16 @@ function App() {
       try {
         const out = runExpr(code, JSON.stringify(environment || {}));
         if (out.valid) {
-          setResult(out.result !== undefined ? String(out.result) : 'null');
+          return out.result !== undefined ? String(out.result) : 'null';
         } else {
-          setResult(`Error: ${out.error}`);
+          return `Error: ${out.error}`;
         }
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
-        setResult(`Execution Error: ${message}`);
+        return `Execution Error: ${message}`;
       }
     } else {
-      setResult('WASM not loaded yet...');
+      return 'WASM not loaded yet...';
     }
   }, [code, environment, wasmLoaded]);
 
