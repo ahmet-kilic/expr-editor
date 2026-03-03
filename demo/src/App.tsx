@@ -38,22 +38,29 @@ function App() {
   const environment = useMemo(() => {
     try {
       return JSON.parse(envJson);
-    } catch (e) {
+    } catch {
       return null;
     }
   }, [envJson]);
 
   useEffect(() => {
-    if (wasmLoaded && typeof (globalThis as any).runExpr === 'function') {
+    type RunExprFunc = (code: string, env: string) => { valid: boolean; result?: string; error?: string };
+    const runExpr = (globalThis as unknown as { runExpr?: RunExprFunc }).runExpr;
+
+    if (wasmLoaded && typeof runExpr === 'function') {
       try {
-        const out = (globalThis as any).runExpr(code, JSON.stringify(environment || {}));
-        if (out.valid) {
-          setResult(out.result !== undefined ? out.result : 'null');
-        } else {
-          setResult(`Error: ${out.error}`);
-        }
-      } catch (err: any) {
-        setResult(`Execution Error: ${err.message || String(err)}`);
+        const out = runExpr(code, JSON.stringify(environment || {}));
+        setTimeout(() => {
+          if (out.valid) {
+            setResult(out.result !== undefined ? String(out.result) : 'null');
+          } else {
+            setResult(`Error: ${out.error}`);
+          }
+        }, 0);
+      } catch (err: unknown) {
+        setTimeout(() => {
+          setResult(`Execution Error: ${(err as Error).message || String(err)}`);
+        }, 0);
       }
     } else {
       setResult('WASM not loaded yet...');
@@ -81,7 +88,7 @@ function App() {
         <strong>Theme: </strong>
         <select
           value={themeMode}
-          onChange={(e) => setThemeMode(e.target.value as any)}
+          onChange={(e) => setThemeMode(e.target.value as 'light' | 'dark' | 'dracula' | 'vscode')}
           style={{ padding: '5px', borderRadius: '4px', border: preStyles.border, background: preStyles.background, color: preStyles.color }}
         >
           <option value="light">Light</option>
