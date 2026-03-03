@@ -17,6 +17,13 @@ function decodeBase64ToArrayBuffer(base64: string): ArrayBuffer {
     return bytes.buffer;
 }
 
+/**
+ * Initializes the WebAssembly module for the expression linter.
+ * It decodes the bundled base64 WASM binary and instantiates it.
+ * This must be called and awaited before the linter can be used.
+ * 
+ * @returns A promise that resolves when the WASM module is fully loaded and running.
+ */
 export async function initWasm(): Promise<void> {
     if (wasmReady) return;
     if (!wasmInitializing) {
@@ -37,6 +44,11 @@ export async function initWasm(): Promise<void> {
     return wasmInitializing;
 }
 
+/**
+ * Checks if the WebAssembly module has been successfully loaded and is ready for use.
+ * 
+ * @returns True if the WASM module is ready, otherwise false.
+ */
 export function isWasmReady() {
     return wasmReady;
 }

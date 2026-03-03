@@ -7,10 +7,25 @@ import { getExprLinter } from './linter';
 import { getExprAutocomplete } from './autocomplete';
 import { initWasm, isWasmReady } from './wasmLoader';
 
+/**
+ * Props for the ExprEditor component.
+ * Extends ReactCodeMirrorProps but omits 'extensions' as it is managed internally.
+ */
 export interface ExprEditorProps extends Omit<ReactCodeMirrorProps, 'extensions'> {
+    /**
+     * The evaluation environment consisting of variables and functions.
+     * This defines what autocomplete and linting features will recognize.
+     */
     environment?: Record<string, any>;
 }
 
+/**
+ * A React component that provides a CodeMirror editor configured for the 'expr' language.
+ * Includes syntax highlighting, linting via WebAssembly, and autocompletion based on the provided environment.
+ * 
+ * @param props - The component props including the environment objects.
+ * @returns A React CodeMirror instance tailored for expr expressions.
+ */
 export const ExprEditor: React.FC<ExprEditorProps> = ({
     environment = {},
     ...props

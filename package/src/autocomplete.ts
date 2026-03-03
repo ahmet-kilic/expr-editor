@@ -74,6 +74,14 @@ const builtins: Record<string, { signature: string, info: string }> = {
     bitushr: { signature: 'bitushr(int, int) int', info: 'Returns the values resulting from the unsigned Right Shift operation.' }
 };
 
+/**
+ * Creates an autocomplete extension for CodeMirror tailored to the 'expr' language.
+ * Provides completions for variables and functions based on the provided environment,
+ * as well as built-in functions and keywords of the language.
+ * 
+ * @param environment - The evaluation environment containing variables and functions.
+ * @returns An autocomplete source function for CodeMirror's autocompletion extension.
+ */
 export function getExprAutocomplete(environment: Record<string, any>) {
     return (context: CompletionContext): CompletionResult | null => {
         let match = context.matchBefore(/[\w.\[\]'"]*/);
