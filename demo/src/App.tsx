@@ -6,7 +6,6 @@ import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 function App() {
   const [code, setCode] = useState('user.Age > 18 && filter(tweets, .Len > 140)');
   const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'dracula' | 'vscode'>('dark');
-  const [result, setResult] = useState<string>('');
   const [wasmLoaded, setWasmLoaded] = useState(isWasmReady());
 
   useEffect(() => {
@@ -38,25 +37,29 @@ function App() {
   const environment = useMemo(() => {
     try {
       return JSON.parse(envJson);
-    } catch (e) {
+    } catch {
       return null;
     }
   }, [envJson]);
 
-  useEffect(() => {
-    if (wasmLoaded && typeof (globalThis as any).runExpr === 'function') {
+  const result = useMemo(() => {
+    type RunExprFunc = (code: string, env: string) => { valid: boolean; result?: string; error?: string };
+    const runExpr = (globalThis as unknown as { runExpr?: RunExprFunc }).runExpr;
+
+    if (wasmLoaded && typeof runExpr === 'function') {
       try {
-        const out = (globalThis as any).runExpr(code, JSON.stringify(environment || {}));
+        const out = runExpr(code, JSON.stringify(environment || {}));
         if (out.valid) {
-          setResult(out.result !== undefined ? out.result : 'null');
+          return out.result !== undefined ? String(out.result) : 'null';
         } else {
-          setResult(`Error: ${out.error}`);
+          return `Error: ${out.error}`;
         }
-      } catch (err: any) {
-        setResult(`Execution Error: ${err.message || String(err)}`);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        return `Execution Error: ${message}`;
       }
     } else {
-      setResult('WASM not loaded yet...');
+      return 'WASM not loaded yet...';
     }
   }, [code, environment, wasmLoaded]);
 
@@ -81,7 +84,7 @@ function App() {
         <strong>Theme: </strong>
         <select
           value={themeMode}
-          onChange={(e) => setThemeMode(e.target.value as any)}
+          onChange={(e) => setThemeMode(e.target.value as 'light' | 'dark' | 'dracula' | 'vscode')}
           style={{ padding: '5px', borderRadius: '4px', border: preStyles.border, background: preStyles.background, color: preStyles.color }}
         >
           <option value="light">Light</option>

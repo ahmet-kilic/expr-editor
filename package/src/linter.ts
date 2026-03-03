@@ -2,6 +2,13 @@ import { Diagnostic } from '@codemirror/lint';
 import { EditorView } from '@codemirror/view';
 import { isWasmReady } from './wasmLoader';
 
+/**
+ * Creates a CodeMirror lint source for the 'expr' language.
+ * Validates expressions using the provided environment JSON against the Go-based WASM linter.
+ * 
+ * @param environmentJson - A JSON string representation of the environment variables and functions.
+ * @returns A lint source function compatible with CodeMirror's linter extension.
+ */
 export function getExprLinter(environmentJson?: string) {
     return (view: EditorView): Diagnostic[] => {
         if (!isWasmReady() || !globalThis.lintExpr) return [];

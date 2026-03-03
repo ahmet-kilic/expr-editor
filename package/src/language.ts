@@ -2,6 +2,10 @@ import { LRLanguage, LanguageSupport } from "@codemirror/language";
 import { styleTags, tags as t } from "@lezer/highlight";
 import { parser } from "./expr.js";
 
+/**
+ * Defines the CodeMirror language support for the 'expr' language.
+ * Connects the Lezer parser with CodeMirror's highlighting tags.
+ */
 export const exprLanguage = LRLanguage.define({
     name: "expr",
     parser: parser.configure({
@@ -35,6 +39,12 @@ export const exprLanguage = LRLanguage.define({
     }
 });
 
+/**
+ * Returns a LanguageSupport instance for the 'expr' language.
+ * This can be used as an extension in CodeMirror.
+ * 
+ * @returns The language support extension for CodeMirror.
+ */
 export function expr() {
     return new LanguageSupport(exprLanguage);
 }

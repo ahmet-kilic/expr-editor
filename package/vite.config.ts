@@ -30,7 +30,16 @@ export default defineConfig({
     dts(),
     {
       name: 'inline-wasm',
-      transform(code, id) {
+      enforce: 'pre',
+      resolveId(source, importer) {
+        if (source.endsWith('.wasm?raw')) {
+          if (importer && source.startsWith('.')) {
+            return path.resolve(path.dirname(importer), source);
+          }
+          return source;
+        }
+      },
+      load(id) {
         if (id.endsWith('.wasm?raw')) {
           const filePath = id.replace('?raw', '');
           const buffer = readFileSync(filePath);
