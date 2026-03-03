@@ -50,17 +50,14 @@ function App() {
     if (wasmLoaded && typeof runExpr === 'function') {
       try {
         const out = runExpr(code, JSON.stringify(environment || {}));
-        setTimeout(() => {
-          if (out.valid) {
-            setResult(out.result !== undefined ? String(out.result) : 'null');
-          } else {
-            setResult(`Error: ${out.error}`);
-          }
-        }, 0);
+        if (out.valid) {
+          setResult(out.result !== undefined ? String(out.result) : 'null');
+        } else {
+          setResult(`Error: ${out.error}`);
+        }
       } catch (err: unknown) {
-        setTimeout(() => {
-          setResult(`Execution Error: ${(err as Error).message || String(err)}`);
-        }, 0);
+        const message = err instanceof Error ? err.message : String(err);
+        setResult(`Execution Error: ${message}`);
       }
     } else {
       setResult('WASM not loaded yet...');
